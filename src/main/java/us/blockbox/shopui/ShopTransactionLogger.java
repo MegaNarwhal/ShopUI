@@ -1,25 +1,25 @@
 package us.blockbox.shopui;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import org.apache.commons.lang.Validate;
 
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-//Created 11/23/2016 11:01 PM
+import static us.blockbox.shopui.ShopUI.plugin;
+
 @SuppressWarnings("ResultOfMethodCallIgnored")
 class ShopTransactionLogger{
 	private final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	private final File file;
 	private final Queue<String> msgQueue = new LinkedList<>();
 	private static final Set<ShopTransactionLogger> loggerSet = Collections.synchronizedSet(new HashSet<ShopTransactionLogger>());
-	private static final JavaPlugin plugin = ShopUI.plugin;
 	private static final int maxLines = 1000;
 
 	ShopTransactionLogger(String fileName){
 		this.file = chooseFile(fileName);
-		ShopUI.log.info(file.getName());
+		ShopUI.log.info("Log file: " + file.getName());
 		loggerSet.add(this);
 	}
 
@@ -48,14 +48,18 @@ class ShopTransactionLogger{
 					e.printStackTrace();
 				}
 			}
-			PrintWriter pw = null;
+			final PrintWriter pw;
 			try{
 				pw = new PrintWriter(new FileWriter(file,true));
 			}catch(IOException e){
 				e.printStackTrace();
+				return false;
 			}
 			while(!msgQueue.isEmpty()){
-				pw.println(msgQueue.poll());
+				final String msg = msgQueue.poll();
+				if(msg != null){
+					pw.println(msg);
+				}
 			}
 			pw.flush();
 			pw.close();
@@ -101,31 +105,24 @@ class ShopTransactionLogger{
 		}
 	}
 
-	private static File chooseFile(String file){
-		int i = -1;
-		File testFile = null;
-		for(File f : plugin.getDataFolder().listFiles()){
-			if(!f.getName().startsWith(file)){
-				continue;
-			}
-			final String[] name = f.getName().split("_");
-			final int num = Integer.parseInt(name[name.length - 1].replace(".txt",""));
-			if(num > i){
-				ShopUI.log.info("found file " + num);
-				i = num;
-			}
+	private static File chooseFile(String fileName){
+		Validate.notNull(fileName);
+		final File testFile;
+		final File firstFile = new File(plugin.getDataFolder(),fileName + "_0.txt");
+		if(!plugin.getDataFolder().exists()){
+			plugin.getDataFolder().mkdir();
+			return firstFile;
 		}
-		if(i != -1){
-			testFile = new File(plugin.getDataFolder(),file + "_" + i + ".txt");
+		final File[] dataFolderFiles = plugin.getDataFolder().listFiles();
+		if(dataFolderFiles == null || dataFolderFiles.length == 0) return firstFile;
+		final int i = pickHighest(fileName,dataFolderFiles);
+		ShopUI.log.info("Highest log file number is " + i);
+		if(i == -1){
+			return firstFile;
 		}else{
-			testFile = new File(plugin.getDataFolder(),file + "_" + 0 + ".txt");
-			try{
-				testFile.createNewFile();
-			}catch(IOException e){
-				e.printStackTrace();
-			}
+			testFile = new File(plugin.getDataFolder(),fileName + "_" + i + ".txt");
 		}
-		int lines = maxLines;
+		int lines = 0;
 		try{
 			lines = countLines(testFile);
 		}catch(IOException e){
@@ -133,13 +130,30 @@ class ShopTransactionLogger{
 		}
 		if(lines > maxLines){
 			ShopUI.log.info("Over " + maxLines + " lines, starting new file.");
-			testFile = new File(plugin.getDataFolder(),file + "_" + (i+1) + ".txt");
-			try{
-				testFile.createNewFile();
-			}catch(IOException e){
-				e.printStackTrace();
-			}
+			return new File(plugin.getDataFolder(),fileName + "_" + (i+1) + ".txt");
 		}
 		return testFile;
+	}
+
+	private static int pickHighest(String prefix,File... files){
+		Validate.notNull(prefix);
+		Validate.notNull(files);
+		int i = -1;
+		for(final File f : files){
+			if(!f.getName().startsWith(prefix)){
+				continue;
+			}
+			final String[] name = f.getName().split("_");
+			final int num;
+			try{
+				num = Integer.parseInt(name[name.length - 1].replace(".txt",""));
+			}catch(NumberFormatException ex){
+				continue;
+			}
+			if(num > i){
+				i = num;
+			}
+		}
+		return i;
 	}
 }
