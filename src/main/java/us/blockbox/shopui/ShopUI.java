@@ -15,10 +15,10 @@ import java.util.logging.Logger;
 public class ShopUI extends JavaPlugin{
 
 	public static Logger log;
-	static JavaPlugin plugin;
+	static ShopUI plugin;
 	private static Economy econ;
 	public static final String prefix = ChatColor.GREEN + "Shop" + ChatColor.DARK_GRAY + "> " + ChatColor.RESET;
-	private static final SubCommandHandler sub = SubCommandHandler.getInstance();
+	private final SubCommandHandler sub = SubCommandHandler.getInstance();
 
 	@Override
 	public void onEnable(){
