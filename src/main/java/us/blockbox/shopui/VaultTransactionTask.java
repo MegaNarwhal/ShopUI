@@ -11,7 +11,7 @@ public class VaultTransactionTask extends BukkitRunnable{
 	private static final Economy econ = ShopUI.getEcon();
 	private OfflinePlayer player;
 	private double money;
-	static final ShopTransactionLogger logger = new ShopTransactionLogger("transactions");
+	private static final ShopTransactionLogger logger = new ShopTransactionLogger("transactions");
 	private final Material material;
 
 	public VaultTransactionTask(OfflinePlayer player,double money,Material material){

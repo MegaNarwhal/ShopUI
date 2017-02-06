@@ -1,10 +1,14 @@
 package us.blockbox.shopui;
 
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.inventivetalent.update.spiget.SpigetUpdate;
+import org.inventivetalent.update.spiget.UpdateCallback;
+import org.inventivetalent.update.spiget.comparator.VersionComparator;
 import us.blockbox.shopui.command.*;
 import us.blockbox.shopui.listener.ShopInteractListener;
 import us.blockbox.shopui.locale.ShopMessage;
@@ -26,6 +30,24 @@ public class ShopUI extends JavaPlugin{
 		plugin = this;
 		ShopConfig shopConfig = ShopConfig.getInstance();
 		shopConfig.loadConfig();
+		if(shopConfig.isUpdaterEnabled()){
+			final SpigetUpdate updater = new SpigetUpdate(this,33864);
+			updater.setVersionComparator(VersionComparator.EQUAL);
+//			updater.setVersionComparator(VersionComparator.SEM_VER);
+			updater.checkForUpdate(new UpdateCallback(){
+				@Override
+				public void updateAvailable(String newVersion,String downloadUrl,boolean hasDirectDownload){
+					log.warning("An update is available! You're running " + getDescription().getVersion() + ", the latest version is " + newVersion + ".");
+					log.warning(downloadUrl);
+					log.warning("You can disable update checking in the config.yml.");
+				}
+
+				@Override
+				public void upToDate(){
+					log.info("You're running the latest version. You can disable update checking in the config.yml.");
+				}
+			});
+		}
 		getCommand("shop").setExecutor(new CommandShop());
 		getCommand("shopui").setExecutor(new CommandShopUI());
 		getCommand("shopui").setTabCompleter(new ShopUICompleter());
@@ -33,14 +55,19 @@ public class ShopUI extends JavaPlugin{
 		sub.addSubCommand("list",new CommandListShops());
 		sub.addSubCommand("create",new CommandCategory());
 
-		setupEconomy();
+		if(setupEconomy()){
+			log.info("Economy successfully hooked. " + econ.getName());
+		}else{
+			log.severe("Failed to hook economy. Disabling ShopUI.");
+			Bukkit.getPluginManager().disablePlugin(this);
+		}
 
 		getServer().getPluginManager().registerEvents(new ShopInteractListener(this),this);
 	}
 
 	@Override
 	public void onDisable(){
-		for(Player p : getServer().getOnlinePlayers()){
+		for(final Player p : getServer().getOnlinePlayers()){
 			final String title = p.getOpenInventory().getTitle();
 			if(ShopInventory.isShopInventory(title)){
 				log.info(p.getName() + " was using shop, closing inventory.");

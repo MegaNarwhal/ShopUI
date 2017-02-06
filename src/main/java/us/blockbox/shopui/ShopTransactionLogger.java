@@ -9,7 +9,6 @@ import java.util.*;
 
 import static us.blockbox.shopui.ShopUI.plugin;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
 class ShopTransactionLogger{
 	private final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	private final File file;
@@ -33,7 +32,8 @@ class ShopTransactionLogger{
 		flushQueue();
 	}
 
-	boolean flushQueue(){
+	@SuppressWarnings("ResultOfMethodCallIgnored")
+	private boolean flushQueue(){
 		synchronized(msgQueue){
 			if(msgQueue.isEmpty()){
 				return true;
@@ -71,37 +71,29 @@ class ShopTransactionLogger{
 
 	static void flushAllQueues(){
 		for(final ShopTransactionLogger logger : loggerSet){
-//			ShopUI.log.info("Flushing to file: " + logger.getFile().getName());
 			logger.flushQueue();
 		}
 	}
 
-	public File getFile(){
+	private File getFile(){
 		return file;
 	}
 
-/*	public void setFile(File file){
-		this.file = file;
-	}*/
-
-	public static int countLines(File file) throws IOException {
-		InputStream is = new BufferedInputStream(new FileInputStream(file));
-		try {
+	private static int countLines(File file) throws IOException {
+		try(InputStream is = new BufferedInputStream(new FileInputStream(file))){
 			byte[] c = new byte[1024];
 			int count = 0;
 			int readChars = 0;
 			boolean empty = true;
-			while ((readChars = is.read(c)) != -1) {
+			while((readChars = is.read(c)) != -1){
 				empty = false;
-				for (int i = 0; i < readChars; ++i) {
-					if (c[i] == '\n') {
+				for(int i = 0; i < readChars; ++i){
+					if(c[i] == '\n'){
 						++count;
 					}
 				}
 			}
 			return (count == 0 && !empty) ? 1 : count;
-		} finally {
-			is.close();
 		}
 	}
 

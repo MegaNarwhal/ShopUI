@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
-import static us.blockbox.shopui.ShopConfig.*;
 import static us.blockbox.shopui.ShopUI.log;
 import static us.blockbox.shopui.ShopUI.prefix;
 
@@ -33,6 +32,7 @@ public class ShopInteractListener implements Listener{
 	private static Economy econ = ShopUI.getEcon();
 	private static final EnumSet<ClickType> clicksValid = EnumSet.of(ClickType.LEFT,ClickType.SHIFT_LEFT,ClickType.RIGHT,ClickType.SHIFT_RIGHT);
 	private static final String currencyName = econ.currencyNamePlural();
+	private static final ShopConfig config = ShopConfig.getInstance();
 
 	public ShopInteractListener(JavaPlugin plugin){
 		ShopInteractListener.plugin = plugin;
@@ -50,7 +50,7 @@ public class ShopInteractListener implements Listener{
 
 		final Set<Integer> clickedSlots = e.getRawSlots();
 		final int shopSlots = e.getView().getTopInventory().getSize();
-		for(Integer i : clickedSlots){
+		for(final Integer i : clickedSlots){
 			if(i < shopSlots){
 				e.setCancelled(true);
 				return;
@@ -124,7 +124,7 @@ public class ShopInteractListener implements Listener{
 		}
 	}
 
-	private static void shopInteract(final ClickType click,final int clickedSlot,final String title,final Player p){
+	private void shopInteract(final ClickType click,final int clickedSlot,final String title,final Player p){
 //		final List<String> lore = item.getItemMeta().getLore();
 		final ShopItem shopItem = getShopByTitle(title).get(clickedSlot);
 		final double priceBuy = shopItem.getPriceBuy();
@@ -277,10 +277,10 @@ public class ShopInteractListener implements Listener{
 		}
 	}
 
-	private static void menuInteract(Player p,ItemStack item){
+	private void menuInteract(Player p,ItemStack item){
 		final Inventory inv = ShopInventory.getShopInventory(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
 		if(inv != null){
-			if(debugEnabled()){
+			if(config.debugEnabled()){
 				log.info("Opening inventory " + item.getItemMeta().getDisplayName() + " for " + p.getName());
 			}
 			p.openInventory(inv);
@@ -297,7 +297,7 @@ public class ShopInteractListener implements Listener{
 	}
 
 	public static List<ShopItem> getShopByTitle(String title){
-		return shopItems.get(shopCategories.get(title).getShopId());
+		return config.shopItems.get(config.shopCategories.get(title).getShopId());
 	}
 
 	private static String prettyName(String item){
@@ -309,12 +309,12 @@ public class ShopInteractListener implements Listener{
 		return ((itemInfo == null) ? prettyName(stack.getType().toString()) : itemInfo.getName());
 	}
 
-	private static boolean cannotFit(final Inventory inventory,final ItemStack itemStack){
+	private boolean cannotFit(final Inventory inventory,final ItemStack itemStack){
 		if(inventory.firstEmpty() != -1){
 			return false;
 		}
 		if(!inventory.containsAtLeast(itemStack,1)){
-			if(debugEnabled()){
+			if(config.debugEnabled()){
 				log.info(itemStack.getType().toString() + " cannot fit in inventory, no similar stacks already present.");
 			}
 			return true;
@@ -325,13 +325,13 @@ public class ShopInteractListener implements Listener{
 				continue;
 			}
 			if(invStack.getAmount() + itemStack.getAmount() <= itemStack.getMaxStackSize()){
-				if(debugEnabled()){
+				if(config.debugEnabled()){
 					log.info(itemStack.getType().toString() + " can fit in inventory, similar stack present in inventory has enough space for items.");
 				}
 				return false;
 			}
 		}
-		if(debugEnabled()){
+		if(config.debugEnabled()){
 			log.info(itemStack.getType().toString() + " cannot fit in inventory, similar stacks are present but none have enough space.");
 		}
 		return true;

@@ -18,16 +18,15 @@ import static us.blockbox.shopui.ShopUI.plugin;
 //Created 11/20/2016 2:54 AM
 public class ShopConfig{
 
-	private static Logger log = plugin.getLogger();
-//	private static FileConfiguration config;
-	private static FileConfiguration categoryConfig;
-	private static File categoryConfigFile = new File(plugin.getDataFolder(),"shops.yml");
-	public static Map<String,List<ShopItem>> shopItems = new HashMap<>();
-	public static Map<String,ShopCategory> shopCategories = new LinkedHashMap<>();
-//	static Map<String,Inventory>
-	private static boolean debug = false;
+	private Logger log = plugin.getLogger();
+	private FileConfiguration categoryConfig;
+	private File categoryConfigFile = new File(plugin.getDataFolder(),"shops.yml");
+	public Map<String,List<ShopItem>> shopItems = new HashMap<>();
+	public Map<String,ShopCategory> shopCategories = new LinkedHashMap<>();
+	private boolean debug = false;
+	private boolean updaterEnabled = false;
 
-	public static boolean debugEnabled(){
+	public boolean debugEnabled(){
 		return debug;
 	}
 
@@ -41,40 +40,33 @@ public class ShopConfig{
 	}
 
 	void loadConfig(){
-		plugin.saveDefaultConfig();
-
 		if(!categoryConfigFile.isFile()){
 			plugin.saveResource("shops.yml",false);
 		}
 		categoryConfig = YamlConfiguration.loadConfiguration(categoryConfigFile);
 		plugin.saveDefaultConfig();
-		FileConfiguration config = plugin.getConfig();
-		File shopDir = new File(plugin.getDataFolder(),"shops/");
+		final FileConfiguration config = plugin.getConfig();
+		final File shopDir = new File(plugin.getDataFolder(),"shops/");
 		if(!shopDir.exists() && !shopDir.isDirectory()){
 			plugin.saveResource("shops/test.yml",false);
 		}
-
 		debug = config.getBoolean("debug",false);
 		if(debug){
 			log.info("Debugging is enabled!");
 		}
-
+		if(config.isSet("updatechecker")){
+			updaterEnabled = config.getBoolean("updatechecker");
+		}else{
+			config.set("updatechecker",true);
+			updaterEnabled = true;
+			plugin.saveConfig();
+		}
 		shopItems.clear();
 		shopCategories.clear();
-
 		for(final String s : categoryConfig.getKeys(false)){
 			parseCategory(s);
 			parseShop(s);
 		}
-/*		Player p = plugin.getServer().getPlayer("MegaNarwhal_");
-		for(Map.Entry<String,List<ShopItem>> shop : shopItems.entrySet()){
-			for(ShopItem shopItem : shop.getValue()){
-				log.info(shopItem.getPriceBuy() + " " + shopItem.getPriceSell());
-				p.getWorld().dropItem(p.getLocation(),shopItem.getItemStack());
-			}
-		}*/
-
-
 		if(config.getBoolean("forceshopcommand")){
 			log.info("Forcing shop command.");
 			getServer().getPluginManager().registerEvents(new CommandShopPreProcessListener(),plugin);
@@ -179,11 +171,11 @@ public class ShopConfig{
 	}
 
 	@Deprecated
-	public static boolean addItem(final String shop,final String name,final Object itemStack,final double priceBuy,final double priceSell){
+	public boolean addItem(final String shop,final String name,final Object itemStack,final double priceBuy,final double priceSell){
 		return addItem(shop,name,itemStack,priceBuy,priceSell,1);
 	}
 
-	public static boolean addItem(final String shop,final String name,final Object itemStack,final double priceBuy,final double priceSell,int quantity){
+	public boolean addItem(final String shop,final String name,final Object itemStack,final double priceBuy,final double priceSell,int quantity){
 		final File f = new File(plugin.getDataFolder(),"shops/" + shop + ".yml");
 		if(!f.isFile() || !f.exists()){
 			log.warning("File " + f.getName() + " not found, skipping.");
@@ -232,5 +224,9 @@ public class ShopConfig{
 			}
 		}
 		return stack;
+	}
+
+	public boolean isUpdaterEnabled(){
+		return updaterEnabled;
 	}
 }

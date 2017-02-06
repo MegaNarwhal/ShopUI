@@ -13,7 +13,7 @@ import static us.blockbox.shopui.locale.ShopMessage.COMMAND_ADD_FAILED;
 //Created 11/22/2016 7:13 PM
 public class CommandHeldItemAdd implements ISubCommand{
 
-	//todo prevent sell higher than buy
+	private ShopConfig config = ShopConfig.getInstance();
 
 	@Override
 	public boolean onCommand(CommandSender sender,String[] args){
@@ -63,14 +63,14 @@ public class CommandHeldItemAdd implements ISubCommand{
 		}
 
 		if(held.hasItemMeta()){
-			if(ShopConfig.addItem(args[0],(args.length == 5 ? args[4] : args[3]),held,priceBuy,priceSell,amount)){
+			if(config.addItem(args[0],(args.length == 5 ? args[4] : args[3]),held,priceBuy,priceSell,amount)){
 				sender.sendMessage(prefix + "Complex item added to " + args[0] + ".");
 			}else{
 				sender.sendMessage(COMMAND_ADD_FAILED.getMsg());
 			}
 		}else{
 			final String simpleItem = held.getType().toString() + ((held.getDurability() != 0) ? (":" + held.getDurability()) : "");
-			if(ShopConfig.addItem(args[0],(args.length == 5 ? args[4] : args[3]),simpleItem,priceBuy,priceSell,amount)){
+			if(config.addItem(args[0],(args.length == 5 ? args[4] : args[3]),simpleItem,priceBuy,priceSell,amount)){
 				sender.sendMessage(prefix + "Simple item added to " + args[0] + ".");
 			}else{
 				sender.sendMessage(COMMAND_ADD_FAILED.getMsg());

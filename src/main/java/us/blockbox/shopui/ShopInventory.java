@@ -3,12 +3,10 @@ package us.blockbox.shopui;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -23,6 +21,7 @@ public class ShopInventory{
 	private static final Economy econ = ShopUI.getEcon();
 //	private static ItemStack[] shopMenu;
 	private static Map<String,Inventory> shopInvCache = new HashMap<>();
+	private static ShopConfig config = ShopConfig.getInstance();
 
 	public static Inventory getShopInventory(String s){
 		List<ShopItem> list = getShopByTitle(s);
@@ -59,12 +58,12 @@ public class ShopInventory{
 	}
 
 	public static Inventory getShopMenu(final OfflinePlayer player){
-		Inventory inv = Bukkit.createInventory(null,(int)Math.ceil((float)ShopConfig.shopCategories.size()/9)*9,"Shop (Money: " + fmt(econ.getBalance(player)) + ")" + menuSuffix);
+		Inventory inv = Bukkit.createInventory(null,(int)Math.ceil((float)config.shopCategories.size()/9)*9,"Shop (Money: " + fmt(econ.getBalance(player)) + ")" + menuSuffix);
 /*		if(shopMenu != null){
 			inv.addItem(shopMenu);
 		}else{*/
 			int pos = 0;
-			for(final Map.Entry<String,ShopCategory> i : ShopConfig.shopCategories.entrySet()){
+			for(final Map.Entry<String,ShopCategory> i : config.shopCategories.entrySet()){
 				final ItemStack catItem = i.getValue().getItemStack().clone();
 				final ItemMeta meta = catItem.getItemMeta();
 				meta.setDisplayName(i.getValue().getShopNameColored());
@@ -100,7 +99,7 @@ public class ShopInventory{
 		return (title.endsWith(shopSuffix) || title.endsWith(menuSuffix));
 	}
 
-	public static Inventory copyInventory(Inventory inv){
+	private static Inventory copyInventory(Inventory inv){
 		Inventory invCopy = Bukkit.createInventory(null,inv.getSize(),inv.getTitle());
 		for(int i = 0; i < inv.getSize(); i++){
 			ItemStack stack = inv.getItem(i);
