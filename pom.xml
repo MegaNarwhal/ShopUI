@@ -6,8 +6,7 @@
 
     <groupId>us.blockbox.shopui</groupId>
     <artifactId>ShopUI</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
-
+    <version>0.0.4-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>org.bukkit</groupId>
@@ -21,8 +20,12 @@
             <version>1.6</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.inventivetalent.spiget-update</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.3.0</version>
+        </dependency>
     </dependencies>
-
     <repositories>
         <repository>
             <id>spigot-repo</id>
@@ -32,8 +35,11 @@
             <id>vault-repo</id>
             <url>http://nexus.hc.to/content/repositories/pub_releases</url>
         </repository>
+        <repository>
+            <id>inventive-repo</id>
+            <url>https://repo.inventivetalent.org/content/groups/public/</url>
+        </repository>
     </repositories>
-
     <build>
         <finalName>${project.artifactId}</finalName>
         <defaultGoal>clean package install</defaultGoal>
