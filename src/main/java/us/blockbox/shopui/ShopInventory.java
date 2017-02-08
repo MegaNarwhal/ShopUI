@@ -34,7 +34,6 @@ public class ShopInventory{
 				pos++;
 			}
 			setValue(inv);
-			this.valid = true;
 		}
 	};
 	private static Map<String,Inventory> shopInvCache = new HashMap<>();

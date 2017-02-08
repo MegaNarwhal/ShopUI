@@ -1,7 +1,7 @@
 package us.blockbox.shopui;
 
 public abstract class CachedObject<T>{
-	protected boolean valid;
+	private boolean valid;
 	private T value;
 
 	public CachedObject(){
@@ -21,6 +21,7 @@ public abstract class CachedObject<T>{
 	public final T getValue(){
 		if(!valid){
 			validate();
+			this.valid = true;
 		}
 		return value;
 	}

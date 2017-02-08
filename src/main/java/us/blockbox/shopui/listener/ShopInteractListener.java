@@ -112,16 +112,17 @@ public class ShopInteractListener implements Listener{
 
 	@EventHandler (ignoreCancelled = true)
 	public void onInventoryClose(InventoryCloseEvent e){
-		if(e.getView().getTitle().endsWith(ShopInventory.getShopSuffix())){
-			final Player p = (Player)e.getPlayer();
-			p.playSound(p.getLocation(),Sound.ITEM_ARMOR_EQUIP_GENERIC,2F,1.1F);
-			new BukkitRunnable(){
-				@Override
-				public void run(){
-					p.openInventory(ShopInventory.getShopMenu(p));
-				}
-			}.runTaskLater(plugin,1L);
+		if(!e.getView().getTitle().endsWith(ShopInventory.getShopSuffix())){
+			return;
 		}
+		final Player p = (Player)e.getPlayer();
+		p.playSound(p.getLocation(),Sound.ITEM_ARMOR_EQUIP_GENERIC,2F,1.1F);
+		new BukkitRunnable(){
+			@Override
+			public void run(){
+				p.openInventory(ShopInventory.getShopMenu(p));
+			}
+		}.runTaskLater(plugin,1L);
 	}
 
 	private void shopInteract(final ClickType click,final int clickedSlot,final String title,final Player p){
