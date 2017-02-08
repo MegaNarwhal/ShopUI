@@ -137,22 +137,16 @@ public class ShopConfig{
 
 			ItemStack stack = null;
 
-			switch(item.getClass().getSimpleName()){
-				case "ItemStack":{
-					//todo figure out how to check material before deserializing
-					stack = ((ItemStack)item).clone();
-					stack.setAmount(quantity);
-					break;
-				}
-				case "String":{
-					stack = parseItemInfo((String)item,quantity);
-					break;
-				}
-				default:{
-					log.warning("Unrecognized item info type.");
-					break;
-				}
+			//todo figure out how to check material before deserializing
+			if(item instanceof String){
+				stack = parseItemInfo((String)item,quantity);
+			}else if(item instanceof ItemStack){
+				stack = ((ItemStack)item).clone();
+				stack.setAmount(quantity);
+			}else{
+				log.warning("Unrecognized item info type.");
 			}
+
 			if(stack != null){
 				if(debug){
 					log.info("Adding " + stack.getType() + (stack.getDurability() == 0 ? "" : ":" + stack.getDurability()) + " x" + stack.getAmount() + " to " + shop + ".");
