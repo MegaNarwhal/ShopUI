@@ -56,7 +56,7 @@ public class ShopUI extends JavaPlugin{
 		sub.addSubCommand("create",new CommandCategory());
 
 		if(setupEconomy()){
-			log.info("Economy successfully hooked. " + econ.getName());
+			log.info("Economy successfully hooked: " + econ.getName());
 		}else{
 			log.severe("Failed to hook economy. Disabling ShopUI.");
 			Bukkit.getPluginManager().disablePlugin(this);

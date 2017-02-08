@@ -18,72 +18,63 @@ public class ShopInventory{
 
 	private static final String shopSuffix = "§2§9§2";
 	private static final String menuSuffix = "§2§9§3";
+	private static final String menuTitleFormat = "Shop (Money: %s)" + menuSuffix;
 	private static final Economy econ = ShopUI.getEcon();
-//	private static ItemStack[] shopMenu;
-	private static Map<String,Inventory> shopInvCache = new HashMap<>();
-	private static ShopConfig config = ShopConfig.getInstance();
-
-	public static Inventory getShopInventory(String s){
-		List<ShopItem> list = getShopByTitle(s);
-		Inventory inv = Bukkit.createInventory(null,(int)(Math.ceil((float)list.size()/9)*9),s + shopSuffix);
-		if(shopInvCache.containsKey(s)){
-//			Bukkit.getLogger().info("loading from cache: " + s);
-			inv = (shopInvCache.get(s));
-		}else{
-			int pos = 0;
-			for(final ShopItem i : list){
-				final ItemStack item = i.getItemStack().clone();
-				final ItemMeta meta = item.getItemMeta();
-				List<String> loreList = new ArrayList<>(Arrays.asList(ChatColor.GREEN + "Buy: " + ChatColor.WHITE + i.getPriceBuy() + ChatColor.GRAY + " (Left click)",ChatColor.GREEN + "Sell: " + ChatColor.WHITE + i.getPriceSell() + ChatColor.GRAY + " (Right click)"));
-				meta.setLore(loreList);
-				item.setItemMeta(meta);
-				inv.setItem(pos,item);
-				pos++;
-			}
-/*			int i = 0;
-			final ItemStack[] temp = new ItemStack[inv.getSize()];
-			for(final ItemStack itemStack : inv.getContents()){
-				if(itemStack == null){
-					break;
-				}else{
-					temp[i] = itemStack;
-					i++;
-				}
-			}*/
-			//shopInvCache.put(s,Arrays.copyOf(temp,i));
-
-			shopInvCache.put(s,copyInventory(inv));
-		}
-		return inv;
-	}
-
-	public static Inventory getShopMenu(final OfflinePlayer player){
-		Inventory inv = Bukkit.createInventory(null,(int)Math.ceil((float)config.shopCategories.size()/9)*9,"Shop (Money: " + fmt(econ.getBalance(player)) + ")" + menuSuffix);
-/*		if(shopMenu != null){
-			inv.addItem(shopMenu);
-		}else{*/
+	private static final CachedObject<ItemStack[]> menuCache = new CachedObject<ItemStack[]>(){
+		@Override
+		protected void validate(){
+			final ItemStack[] inv = new ItemStack[nearestMultiple(config.shopCategories.size(),9)];
 			int pos = 0;
 			for(final Map.Entry<String,ShopCategory> i : config.shopCategories.entrySet()){
 				final ItemStack catItem = i.getValue().getItemStack().clone();
 				final ItemMeta meta = catItem.getItemMeta();
 				meta.setDisplayName(i.getValue().getShopNameColored());
 				catItem.setItemMeta(meta);
-				inv.setItem(pos,catItem);
+				inv[pos] = catItem;
 				pos++;
 			}
-			//todo rework caching to prevent stacking of identical items
-/*			int i = 0;
-			final ItemStack[] temp = new ItemStack[inv.getSize()];
-			for(final ItemStack itemStack : inv.getContents()){
-				if(itemStack == null){
-					break;
-				}else{
-					temp[i] = itemStack;
-					i++;
-				}
+			setValue(inv);
+			this.valid = true;
+		}
+	};
+	private static Map<String,Inventory> shopInvCache = new HashMap<>();
+	private static ShopConfig config = ShopConfig.getInstance();
+
+	public static Inventory getShopInventory(String s){
+		final List<ShopItem> list = getShopByTitle(s);
+		final Inventory inv;
+		if(shopInvCache.containsKey(s)){
+			inv = (shopInvCache.get(s));
+		}else{
+			inv = Bukkit.createInventory(null,nearestMultiple(list.size(),9),s + shopSuffix);
+			int pos = 0;
+			for(final ShopItem i : list){
+				final ItemStack item = i.getItemStack().clone();
+				final ItemMeta meta = item.getItemMeta();
+				final List<String> loreList = new ArrayList<>(Arrays.asList(ChatColor.GREEN + "Buy: " + ChatColor.WHITE + i.getPriceBuy() + ChatColor.GRAY + " (Left click)",ChatColor.GREEN + "Sell: " + ChatColor.WHITE + i.getPriceSell() + ChatColor.GRAY + " (Right click)"));
+				meta.setLore(loreList);
+				item.setItemMeta(meta);
+				inv.setItem(pos,item);
+				pos++;
 			}
-			shopMenu = Arrays.copyOf(temp,i);*/
-//		}
+			shopInvCache.put(s,copyInventory(inv));
+		}
+		return inv;
+	}
+
+	public static Inventory getShopMenu(final OfflinePlayer player){
+		return getShopMenu(String.format(menuTitleFormat,fmt(econ.getBalance(player))));
+	}
+
+	public static int nearestMultiple(int number,int round){
+		return (int)Math.ceil((float)number / round) * round;
+	}
+
+	private static Inventory getShopMenu(String title){
+		final ItemStack[] cache = menuCache.getValue();
+		final Inventory inv = Bukkit.createInventory(null,cache.length,title);
+		inv.setContents(cache);
+		//todo is stacking of identical items still an issue?
 		return inv;
 	}
 
@@ -100,6 +91,12 @@ public class ShopInventory{
 	}
 
 	private static Inventory copyInventory(Inventory inv){
+		final Inventory invCopy = Bukkit.createInventory(null,inv.getSize(),inv.getTitle());
+		invCopy.setContents(inv.getContents());
+		return invCopy;
+	}
+
+/*	private static Inventory copyInventory(Inventory inv){
 		Inventory invCopy = Bukkit.createInventory(null,inv.getSize(),inv.getTitle());
 		for(int i = 0; i < inv.getSize(); i++){
 			ItemStack stack = inv.getItem(i);
@@ -109,5 +106,5 @@ public class ShopInventory{
 			invCopy.setItem(i,stack.clone());
 		}
 		return invCopy;
-	}
+	}*/
 }
