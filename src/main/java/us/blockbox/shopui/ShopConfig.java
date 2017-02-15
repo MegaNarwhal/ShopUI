@@ -13,11 +13,11 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import static org.bukkit.Bukkit.getServer;
-import static us.blockbox.shopui.ShopUI.plugin;
 
 //Created 11/20/2016 2:54 AM
 public class ShopConfig{
 
+	private final ShopUI plugin = ShopUI.getInstance();
 	private Logger log = plugin.getLogger();
 	private FileConfiguration categoryConfig;
 	private File categoryConfigFile = new File(plugin.getDataFolder(),"shops.yml");

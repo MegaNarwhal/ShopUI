@@ -16,10 +16,13 @@ import us.blockbox.shopui.tabcomplete.ShopUICompleter;
 
 import java.util.logging.Logger;
 
+import static us.blockbox.shopui.locale.ShopMessage.Message.OPEN_FAILED;
+import static us.blockbox.shopui.locale.ShopMessage.getMessage;
+
 public class ShopUI extends JavaPlugin{
 
 	public static Logger log;
-	static ShopUI plugin;
+	private static ShopUI instance = null;
 	private static Economy econ;
 	public static final String prefix = ChatColor.GREEN + "Shop" + ChatColor.DARK_GRAY + "> " + ChatColor.RESET;
 	private final SubCommandHandler sub = SubCommandHandler.getInstance();
@@ -27,7 +30,9 @@ public class ShopUI extends JavaPlugin{
 	@Override
 	public void onEnable(){
 		log = getLogger();
-		plugin = this;
+		if(instance == null){
+			instance = this;
+		}
 		ShopConfig shopConfig = ShopConfig.getInstance();
 		shopConfig.loadConfig();
 		if(shopConfig.isUpdaterEnabled()){
@@ -61,7 +66,7 @@ public class ShopUI extends JavaPlugin{
 			log.severe("Failed to hook economy. Disabling ShopUI.");
 			Bukkit.getPluginManager().disablePlugin(this);
 		}
-
+		ShopMessage.loadMessages();
 		getServer().getPluginManager().registerEvents(new ShopInteractListener(this),this);
 	}
 
@@ -72,7 +77,7 @@ public class ShopUI extends JavaPlugin{
 			if(ShopInventory.isShopInventory(title)){
 				log.info(p.getName() + " was using shop, closing inventory.");
 				p.closeInventory();
-				p.sendMessage(ShopMessage.OPEN_FAILED.getMsg());
+				p.sendMessage(getMessage(OPEN_FAILED));
 			}
 		}
 		ShopTransactionLogger.flushAllQueues();
@@ -92,5 +97,9 @@ public class ShopUI extends JavaPlugin{
 
 	public static Economy getEcon(){
 		return econ;
+	}
+
+	public static ShopUI getInstance(){
+		return instance;
 	}
 }

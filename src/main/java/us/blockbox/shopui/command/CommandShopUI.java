@@ -5,11 +5,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import us.blockbox.shopui.ISubCommand;
 import us.blockbox.shopui.SubCommandHandler;
-import us.blockbox.shopui.locale.ShopMessage;
 
 import java.util.Arrays;
 
 import static us.blockbox.shopui.ShopUI.prefix;
+import static us.blockbox.shopui.locale.ShopMessage.Message.PLAYER_PERMISSION_INSUFFICIENT;
+import static us.blockbox.shopui.locale.ShopMessage.getMessage;
 
 public class CommandShopUI implements CommandExecutor{
 
@@ -18,7 +19,7 @@ public class CommandShopUI implements CommandExecutor{
 	@Override
 	public boolean onCommand(CommandSender sender,Command command,String label,String[] args){
 		if(!sender.hasPermission("shopui.command.manage")){
-			sender.sendMessage(ShopMessage.PLAYER_PERMISSION_INSUFFICIENT.getMsg());
+			sender.sendMessage(getMessage(PLAYER_PERMISSION_INSUFFICIENT));
 			return true;
 		}
 		if(args.length > 0){

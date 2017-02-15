@@ -1,26 +1,42 @@
 package us.blockbox.shopui.locale;
 
-//Created 11/23/2016 10:15 PM
-
-
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import us.blockbox.shopui.ShopUI;
 
-public enum ShopMessage{
-	OPEN_FAILED("Sorry, can't access the shop right now. Try again in a minute."),
-	PLAYER_INVENTORY_FULL("Your inventory is full!"),
-	PLAYER_MONEY_INSUFFICIENT(null),
-	PLAYER_PERMISSION_INSUFFICIENT("You don't have permission."),
-	COMMAND_ADD_FAILED("Add failed. The specified name might already be in the config, or the file may not exist.");
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
-	private static final String prefix = ShopUI.prefix;
-	private final String msg;
+public class ShopMessage{
+	private static ShopUI plugin = ShopUI.getInstance();
+	private static File messageFile = new File(plugin.getDataFolder(),"messages.yml");
 
-	ShopMessage(String msg){
-		this.msg = msg;
+	private ShopMessage(){
 	}
 
-	public String getMsg(){
-		return prefix + this.msg;
+	public enum Message{
+		COMMAND_ADD_FAILED,
+		OPEN_FAILED,
+		PLAYER_INVENTORY_FULL,
+		PLAYER_MONEY_INSUFFICIENT,
+		PLAYER_PERMISSION_INSUFFICIENT
+	}
+
+	private static Map<Message,String> messages = new HashMap<>();
+
+	public static void loadMessages(){
+		if(!messageFile.exists() || !messageFile.isFile()){
+			plugin.saveResource("messages.yml",false);
+		}
+		final FileConfiguration c = YamlConfiguration.loadConfiguration(messageFile);
+		for(final Message m : Message.values()){
+			messages.put(m,c.getString(m.name()));
+		}
+	}
+
+	public static String getMessage(Message message){
+		return messages.get(message);
 	}
 }
 

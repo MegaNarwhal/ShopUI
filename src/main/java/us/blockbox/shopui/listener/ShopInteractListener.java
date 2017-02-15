@@ -17,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import us.blockbox.shopui.*;
-import us.blockbox.shopui.locale.ShopMessage;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,9 +24,13 @@ import java.util.*;
 
 import static us.blockbox.shopui.ShopUI.log;
 import static us.blockbox.shopui.ShopUI.prefix;
+import static us.blockbox.shopui.locale.ShopMessage.Message.PLAYER_INVENTORY_FULL;
+import static us.blockbox.shopui.locale.ShopMessage.getMessage;
 
 public class ShopInteractListener implements Listener{
 
+	private static final String formatBuy = prefix + "You bought %d %s for %s%s."; //todo localization
+	private static final String formatSell = prefix + "You sold %d %s for %s%s.";
 	private static JavaPlugin plugin;
 	private static Economy econ = ShopUI.getEcon();
 	private static final EnumSet<ClickType> clicksValid = EnumSet.of(ClickType.LEFT,ClickType.SHIFT_LEFT,ClickType.RIGHT,ClickType.SHIFT_RIGHT);
@@ -41,7 +44,7 @@ public class ShopInteractListener implements Listener{
 
 	//todo change player money all at once when they close shop?
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onInventoryDrag(InventoryDragEvent e){
 		final String title = e.getView().getTitle();
 		if(!ShopInventory.isShopInventory(title)){
@@ -58,7 +61,7 @@ public class ShopInteractListener implements Listener{
 		}
 	}
 
-	@EventHandler (ignoreCancelled = true)
+	@EventHandler(ignoreCancelled = true)
 	public void onInventoryInteract(InventoryClickEvent e){
 //		log.info(e.getAction().toString());
 		final String title = e.getView().getTitle();
@@ -110,7 +113,7 @@ public class ShopInteractListener implements Listener{
 		menuInteract(p,stack);
 	}
 
-	@EventHandler (ignoreCancelled = true)
+	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent e){
 		if(!e.getView().getTitle().endsWith(ShopInventory.getShopSuffix())){
 			return;
@@ -135,7 +138,7 @@ public class ShopInteractListener implements Listener{
 		switch(click){
 			case LEFT:{
 				if(cannotFit(playerInv,shopStack)){
-					p.sendMessage(ShopMessage.PLAYER_INVENTORY_FULL.getMsg());
+					p.sendMessage(getMessage(PLAYER_INVENTORY_FULL));
 					soundDenied(p);
 					break;
 				}
@@ -148,12 +151,12 @@ public class ShopInteractListener implements Listener{
 					//TODO good idea to use selected.getitemstack instead of shopstack?
 					final HashMap<Integer,ItemStack> failed = playerInv.addItem(shopStack);
 					if(!failed.isEmpty()){
-						p.sendMessage(ShopMessage.PLAYER_INVENTORY_FULL.getMsg());
+						p.sendMessage(getMessage(PLAYER_INVENTORY_FULL));
 						soundDenied(p);
 						break;
 					}
 					new VaultTransactionTask(p,-priceBuy,shopStack.getType()).runTaskAsynchronously(plugin);
-					p.sendMessage(prefix + "You bought " + shopStack.getAmount() + " " + getFriendlyName(shopStack) + " for " + fmt(priceBuy) + currencyName + ".");
+					p.sendMessage(String.format(formatBuy,shopStack.getAmount(),getFriendlyName(shopStack),fmt(priceBuy),currencyName));
 					soundSuccess(p);
 				}else{
 					soundDenied(p);
@@ -162,13 +165,13 @@ public class ShopInteractListener implements Listener{
 			}
 			case SHIFT_LEFT:{
 				if(cannotFit(playerInv,shopStack)){
-					p.sendMessage(ShopMessage.PLAYER_INVENTORY_FULL.getMsg());
+					p.sendMessage(getMessage(PLAYER_INVENTORY_FULL));
 					soundDenied(p);
 					break;
 				}
 				final int maxStack = shopStack.getMaxStackSize();
 				final double bal = econ.getBalance(p);
-				int amount = (int)Math.floor(bal/priceBuy)*shopItem.getQuantityDefault();
+				int amount = (int)Math.floor(bal / priceBuy) * shopItem.getQuantityDefault();
 				if(amount == 0){
 					soundDenied(p);
 					break;
@@ -185,15 +188,15 @@ public class ShopInteractListener implements Listener{
 				final HashMap<Integer,ItemStack> failed = playerInv.addItem(shopStack);
 				if(!failed.isEmpty()){
 					final int failedAmount = failed.get(0).getAmount();
-					price -= failedAmount*(priceBuy/shopItem.getQuantityDefault());
+					price -= failedAmount * (priceBuy / shopItem.getQuantityDefault());
 					amount -= failedAmount;
 				}
 				if(price > 0){
 					new VaultTransactionTask(p,-price,shopStack.getType()).runTaskAsynchronously(plugin);
-					p.sendMessage(prefix + "You bought " + amount + " " + getFriendlyName(shopStack) + " for " + fmt(price) + currencyName + ".");
+					p.sendMessage(String.format(formatBuy,amount,getFriendlyName(shopStack),fmt(price),currencyName));
 					soundSuccess(p);
 				}else{
-					p.sendMessage(ShopMessage.PLAYER_INVENTORY_FULL.getMsg());
+					p.sendMessage(getMessage(PLAYER_INVENTORY_FULL));
 					soundDenied(p);
 				}
 				break;
@@ -223,7 +226,7 @@ public class ShopInteractListener implements Listener{
 
 				if(playerInv.removeItem(shopStack).isEmpty()){
 					new VaultTransactionTask(p,priceSell,shopStack.getType()).runTaskAsynchronously(plugin);
-					p.sendMessage(prefix + "You sold " + quantity + " " + getFriendlyName(shopStack) + " for " + fmt(priceSell) + currencyName + ".");
+					p.sendMessage(String.format(formatSell,quantity,getFriendlyName(shopStack),fmt(priceSell),currencyName));
 					soundSuccess(p);
 				}else{
 					soundDenied(p);
@@ -256,7 +259,7 @@ public class ShopInteractListener implements Listener{
 				if(playerInv.removeItem(shopStack).isEmpty()){
 					double total = BigDecimal.valueOf(priceSell).multiply(BigDecimal.valueOf(amount)).divide(BigDecimal.valueOf(shopItem.getQuantityDefault()),RoundingMode.FLOOR).doubleValue();
 					new VaultTransactionTask(p,total,shopStack.getType()).runTaskAsynchronously(plugin);
-					p.sendMessage(prefix + "You sold " + amount + " " + getFriendlyName(shopStack) + " for " + fmt(total) + currencyName + ".");
+					p.sendMessage(String.format(formatSell,amount,getFriendlyName(shopStack),fmt(total),currencyName));
 					soundSuccess(p);
 				}else{
 					plugin.getLogger().warning("Failed transaction: " + p.getName() + " " + shopStack.getType().toString());
@@ -290,7 +293,7 @@ public class ShopInteractListener implements Listener{
 	}
 
 	private static void soundDenied(Player p){
-	p.playSound(p.getLocation(),Sound.BLOCK_NOTE_HAT,2F,1.88F);
+		p.playSound(p.getLocation(),Sound.BLOCK_NOTE_HAT,2F,1.88F);
 	}
 
 	private static void soundSuccess(Player p){

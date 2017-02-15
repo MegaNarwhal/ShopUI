@@ -1,0 +1,5 @@
+COMMAND_ADD_FAILED: "Add failed. The specified name might already be in the config, or the file may not exist."
+OPEN_FAILED: "Sorry, can't access the shop right now. Try again in a minute."
+PLAYER_INVENTORY_FULL: "Your inventory is full!"
+PLAYER_MONEY_INSUFFICIENT: ""
+PLAYER_PERMISSION_INSUFFICIENT: "You don't have permission."

@@ -5,11 +5,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import us.blockbox.shopui.locale.ShopMessage;
 
 import static us.blockbox.shopui.ShopInventory.getShopMenu;
+import static us.blockbox.shopui.locale.ShopMessage.Message.OPEN_FAILED;
+import static us.blockbox.shopui.locale.ShopMessage.Message.PLAYER_PERMISSION_INSUFFICIENT;
+import static us.blockbox.shopui.locale.ShopMessage.getMessage;
 
-//Created 11/20/2016 4:26 AM
 public class CommandShop implements CommandExecutor{
 	@Override
 	public boolean onCommand(CommandSender sender,Command command,String label,String[] args){
@@ -17,14 +18,14 @@ public class CommandShop implements CommandExecutor{
 			return true;
 		}
 		if(!sender.hasPermission("shopui.command.shop")){
-			sender.sendMessage(ShopMessage.PLAYER_PERMISSION_INSUFFICIENT.getMsg());
+			sender.sendMessage(getMessage(PLAYER_PERMISSION_INSUFFICIENT));
 			return true;
 		}
 		Player p = (Player)sender;
 
 		final Inventory menu = getShopMenu(p);
 		if(menu == null){
-			sender.sendMessage(ShopMessage.OPEN_FAILED.getMsg());
+			sender.sendMessage(getMessage(OPEN_FAILED));
 			return true;
 		}
 		p.openInventory(menu);

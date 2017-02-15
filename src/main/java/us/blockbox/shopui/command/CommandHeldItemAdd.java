@@ -8,7 +8,8 @@ import us.blockbox.shopui.ISubCommand;
 import us.blockbox.shopui.ShopConfig;
 
 import static us.blockbox.shopui.ShopUI.prefix;
-import static us.blockbox.shopui.locale.ShopMessage.COMMAND_ADD_FAILED;
+import static us.blockbox.shopui.locale.ShopMessage.Message.COMMAND_ADD_FAILED;
+import static us.blockbox.shopui.locale.ShopMessage.getMessage;
 
 //Created 11/22/2016 7:13 PM
 public class CommandHeldItemAdd implements ISubCommand{
@@ -66,14 +67,14 @@ public class CommandHeldItemAdd implements ISubCommand{
 			if(config.addItem(args[0],(args.length == 5 ? args[4] : args[3]),held,priceBuy,priceSell,amount)){
 				sender.sendMessage(prefix + "Complex item added to " + args[0] + ".");
 			}else{
-				sender.sendMessage(COMMAND_ADD_FAILED.getMsg());
+				sender.sendMessage(getMessage(COMMAND_ADD_FAILED));
 			}
 		}else{
 			final String simpleItem = held.getType().toString() + ((held.getDurability() != 0) ? (":" + held.getDurability()) : "");
 			if(config.addItem(args[0],(args.length == 5 ? args[4] : args[3]),simpleItem,priceBuy,priceSell,amount)){
 				sender.sendMessage(prefix + "Simple item added to " + args[0] + ".");
 			}else{
-				sender.sendMessage(COMMAND_ADD_FAILED.getMsg());
+				sender.sendMessage(getMessage(COMMAND_ADD_FAILED));
 			}
 		}
 		return true;

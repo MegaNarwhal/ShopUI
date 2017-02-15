@@ -7,9 +7,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static us.blockbox.shopui.ShopUI.plugin;
-
 class ShopTransactionLogger{
+	private static final ShopUI plugin = ShopUI.getInstance();
 	private final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	private final File file;
 	private final Queue<String> msgQueue = new LinkedList<>();
