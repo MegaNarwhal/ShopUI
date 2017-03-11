@@ -323,7 +323,7 @@ public class ShopInteractListener implements Listener{
 			}
 			return true;
 		}
-		//TODO quicker way that wouldnt't involve putting items in player's inventory?
+		//TODO quicker way that wouldn't involve putting items in player's inventory?
 		for(ItemStack invStack : inventory.getContents()){
 			if(invStack == null || !invStack.isSimilar(itemStack)){
 				continue;

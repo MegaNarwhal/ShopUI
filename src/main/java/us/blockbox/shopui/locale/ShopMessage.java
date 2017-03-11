@@ -1,5 +1,6 @@
 package us.blockbox.shopui.locale;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import us.blockbox.shopui.ShopUI;
@@ -31,12 +32,19 @@ public class ShopMessage{
 		}
 		final FileConfiguration c = YamlConfiguration.loadConfiguration(messageFile);
 		for(final Message m : Message.values()){
-			messages.put(m,c.getString(m.name()));
+			messages.put(m,c.getString(m.name())); //todo should prefix be prepended?
 		}
 	}
 
 	public static String getMessage(Message message){
 		return messages.get(message);
+	}
+
+	public static void sendShopMsg(CommandSender sender,Message message){ //todo use this
+		final String msg = getMessage(message);
+		if(msg != null && !msg.equals("")){
+			sender.sendMessage(ShopUI.prefix + msg);
+		}
 	}
 }
 
