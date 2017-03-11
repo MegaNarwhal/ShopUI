@@ -19,7 +19,7 @@ public class ShopInventory{
 	private static final String shopSuffix = "§2§9§2";
 	private static final String menuSuffix = "§2§9§3";
 	private static final String menuTitleFormat = "Shop (Money: %s)" + menuSuffix;
-	private static final Economy econ = ShopUI.getEcon();
+	private static final Economy econ = ShopUI.getInstance().getEcon();
 	private static final CachedObject<ItemStack[]> menuCache = new CachedObject<ItemStack[]>(){
 		@Override
 		protected void validate(){

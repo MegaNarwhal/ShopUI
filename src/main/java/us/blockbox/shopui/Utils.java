@@ -9,12 +9,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
-
-import static us.blockbox.shopui.ShopUI.log;
+import java.util.logging.Logger;
 
 public class Utils{
 	private Utils(){
 	}
+
+	private static final Logger log = ShopUI.getInstance().getLogger();
 
 
 	private static String prettyName(String item){

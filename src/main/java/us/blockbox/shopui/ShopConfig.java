@@ -19,7 +19,7 @@ public class ShopConfig{
 
 	public static final String formatBuy = prefix + "You bought %d %s for %s%s."; //todo move to config
 	public static final String formatSell = prefix + "You sold %d %s for %s%s.";
-	public static final String currencyName = ShopUI.getEcon().currencyNamePlural();
+	public static final String currencyName = ShopUI.getInstance().getEcon().currencyNamePlural();
 	private final ShopUI plugin = ShopUI.getInstance();
 	private Logger log = plugin.getLogger();
 	private FileConfiguration categoryConfig;

@@ -6,9 +6,11 @@ import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Logger;
 
 class ShopTransactionLogger{
 	private static final ShopUI plugin = ShopUI.getInstance();
+	private static final Logger log = ShopUI.getInstance().getLogger();
 	private final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	private final File file;
 	private final Queue<String> msgQueue = new LinkedList<>();
@@ -17,7 +19,7 @@ class ShopTransactionLogger{
 
 	ShopTransactionLogger(String fileName){
 		this.file = chooseFile(fileName);
-		ShopUI.log.info("Log file: " + file.getName());
+		log.info("Log file: " + file.getName());
 		loggerSet.add(this);
 	}
 
@@ -38,7 +40,7 @@ class ShopTransactionLogger{
 				return true;
 			}
 		}
-		ShopUI.log.info("Flushing to file: " + getFile().getName());
+		log.info("Flushing to file: " + getFile().getName());
 		synchronized(file){
 			if(!file.exists()){
 				try{
@@ -107,7 +109,7 @@ class ShopTransactionLogger{
 		final File[] dataFolderFiles = plugin.getDataFolder().listFiles();
 		if(dataFolderFiles == null || dataFolderFiles.length == 0) return firstFile;
 		final int i = pickHighest(fileName,dataFolderFiles);
-		ShopUI.log.info("Highest log file number is " + i);
+		log.info("Highest log file number is " + i);
 		if(i == -1){
 			return firstFile;
 		}else{
@@ -120,7 +122,7 @@ class ShopTransactionLogger{
 			e.printStackTrace();
 		}
 		if(lines > maxLines){
-			ShopUI.log.info("Over " + maxLines + " lines, starting new file.");
+			log.info("Over " + maxLines + " lines, starting new file.");
 			return new File(plugin.getDataFolder(),fileName + "_" + (i+1) + ".txt");
 		}
 		return testFile;

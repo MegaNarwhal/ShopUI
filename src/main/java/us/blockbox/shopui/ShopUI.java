@@ -21,9 +21,9 @@ import static us.blockbox.shopui.locale.ShopMessage.getMessage;
 
 public class ShopUI extends JavaPlugin{
 
-	public static Logger log;
 	private static ShopUI instance = null;
-	private static Economy econ;
+	private Logger log;
+	private Economy econ;
 	public static final String prefix = ChatColor.GREEN + "Shop" + ChatColor.DARK_GRAY + "> " + ChatColor.RESET;
 	private final SubCommandHandler sub = SubCommandHandler.getInstance();
 
@@ -67,7 +67,7 @@ public class ShopUI extends JavaPlugin{
 			Bukkit.getPluginManager().disablePlugin(this);
 		}
 		ShopMessage.loadMessages();
-		getServer().getPluginManager().registerEvents(new ShopInteractListener(this),this);
+		getServer().getPluginManager().registerEvents(new ShopInteractListener(),this);
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class ShopUI extends JavaPlugin{
 		return econ != null;
 	}
 
-	public static Economy getEcon(){
+	public Economy getEcon(){
 		return econ;
 	}
 
