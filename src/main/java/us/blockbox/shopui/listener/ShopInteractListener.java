@@ -1,9 +1,6 @@
 package us.blockbox.shopui.listener;
 
 import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.item.ItemInfo;
-import net.milkbowl.vault.item.Items;
-import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -23,19 +20,17 @@ import java.math.RoundingMode;
 import java.util.*;
 
 import static us.blockbox.shopui.ShopUI.log;
-import static us.blockbox.shopui.ShopUI.prefix;
+import static us.blockbox.shopui.Utils.soundDenied;
+import static us.blockbox.shopui.Utils.soundSuccess;
 import static us.blockbox.shopui.locale.ShopMessage.Message.PLAYER_INVENTORY_FULL;
 import static us.blockbox.shopui.locale.ShopMessage.getMessage;
 
+@Deprecated
 public class ShopInteractListener implements Listener{
 
-	private static final String formatBuy = prefix + "You bought %d %s for %s%s."; //todo localization
-	private static final String formatSell = prefix + "You sold %d %s for %s%s.";
+	private static final Economy econ = ShopUI.getEcon();
 	private static JavaPlugin plugin;
-	private static Economy econ = ShopUI.getEcon();
 	private static final EnumSet<ClickType> clicksValid = EnumSet.of(ClickType.LEFT,ClickType.SHIFT_LEFT,ClickType.RIGHT,ClickType.SHIFT_RIGHT);
-	private static final String currencyName = econ.currencyNamePlural();
-	private static final ShopConfig config = ShopConfig.getInstance();
 
 	public ShopInteractListener(JavaPlugin plugin){
 		ShopInteractListener.plugin = plugin;
@@ -137,7 +132,7 @@ public class ShopInteractListener implements Listener{
 		final Inventory playerInv = p.getInventory();
 		switch(click){
 			case LEFT:{
-				if(cannotFit(playerInv,shopStack)){
+				if(Utils.cannotFit(playerInv,shopStack)){
 					p.sendMessage(getMessage(PLAYER_INVENTORY_FULL));
 					soundDenied(p);
 					break;
@@ -156,7 +151,7 @@ public class ShopInteractListener implements Listener{
 						break;
 					}
 					new VaultTransactionTask(p,-priceBuy,shopStack.getType()).runTaskAsynchronously(plugin);
-					p.sendMessage(String.format(formatBuy,shopStack.getAmount(),getFriendlyName(shopStack),fmt(priceBuy),currencyName));
+					p.sendMessage(String.format(ShopConfig.formatBuy,shopStack.getAmount(),Utils.getFriendlyName(shopStack),Utils.fmt(priceBuy),ShopConfig.currencyName));
 					soundSuccess(p);
 				}else{
 					soundDenied(p);
@@ -164,13 +159,13 @@ public class ShopInteractListener implements Listener{
 				break;
 			}
 			case SHIFT_LEFT:{
-				if(cannotFit(playerInv,shopStack)){
+				if(Utils.cannotFit(playerInv,shopStack)){
 					p.sendMessage(getMessage(PLAYER_INVENTORY_FULL));
 					soundDenied(p);
 					break;
 				}
 				final int maxStack = shopStack.getMaxStackSize();
-				final double bal = econ.getBalance(p);
+				final double bal = ShopUI.getEcon().getBalance(p);
 				int amount = (int)Math.floor(bal / priceBuy) * shopItem.getQuantityDefault();
 				if(amount == 0){
 					soundDenied(p);
@@ -193,7 +188,7 @@ public class ShopInteractListener implements Listener{
 				}
 				if(price > 0){
 					new VaultTransactionTask(p,-price,shopStack.getType()).runTaskAsynchronously(plugin);
-					p.sendMessage(String.format(formatBuy,amount,getFriendlyName(shopStack),fmt(price),currencyName));
+					p.sendMessage(String.format(ShopConfig.formatBuy,amount,Utils.getFriendlyName(shopStack),Utils.fmt(price),ShopConfig.currencyName));
 					soundSuccess(p);
 				}else{
 					p.sendMessage(getMessage(PLAYER_INVENTORY_FULL));
@@ -226,7 +221,7 @@ public class ShopInteractListener implements Listener{
 
 				if(playerInv.removeItem(shopStack).isEmpty()){
 					new VaultTransactionTask(p,priceSell,shopStack.getType()).runTaskAsynchronously(plugin);
-					p.sendMessage(String.format(formatSell,quantity,getFriendlyName(shopStack),fmt(priceSell),currencyName));
+					p.sendMessage(String.format(ShopConfig.formatSell,quantity,Utils.getFriendlyName(shopStack),Utils.fmt(priceSell),ShopConfig.currencyName));
 					soundSuccess(p);
 				}else{
 					soundDenied(p);
@@ -259,7 +254,7 @@ public class ShopInteractListener implements Listener{
 				if(playerInv.removeItem(shopStack).isEmpty()){
 					double total = BigDecimal.valueOf(priceSell).multiply(BigDecimal.valueOf(amount)).divide(BigDecimal.valueOf(shopItem.getQuantityDefault()),RoundingMode.FLOOR).doubleValue();
 					new VaultTransactionTask(p,total,shopStack.getType()).runTaskAsynchronously(plugin);
-					p.sendMessage(String.format(formatSell,amount,getFriendlyName(shopStack),fmt(total),currencyName));
+					p.sendMessage(String.format(ShopConfig.formatSell,amount,Utils.getFriendlyName(shopStack),Utils.fmt(total),ShopConfig.currencyName));
 					soundSuccess(p);
 				}else{
 					plugin.getLogger().warning("Failed transaction: " + p.getName() + " " + shopStack.getType().toString());
@@ -284,7 +279,7 @@ public class ShopInteractListener implements Listener{
 	private void menuInteract(Player p,ItemStack item){
 		final Inventory inv = ShopInventory.getShopInventory(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
 		if(inv != null){
-			if(config.debugEnabled()){
+			if(ShopItemNew.config.debugEnabled()){
 				log.info("Opening inventory " + item.getItemMeta().getDisplayName() + " for " + p.getName());
 			}
 			p.openInventory(inv);
@@ -292,60 +287,8 @@ public class ShopInteractListener implements Listener{
 		}
 	}
 
-	private static void soundDenied(Player p){
-		p.playSound(p.getLocation(),Sound.BLOCK_NOTE_HAT,2F,1.88F);
-	}
-
-	private static void soundSuccess(Player p){
-		p.playSound(p.getLocation(),Sound.ENTITY_EXPERIENCE_ORB_PICKUP,2F,1.18F);
-	}
-
 	public static List<ShopItem> getShopByTitle(String title){
-		return config.shopItems.get(config.shopCategories.get(title).getShopId());
+		return ShopItemNew.config.shopItems.get(ShopItemNew.config.shopCategories.get(title).getShopId());
 	}
 
-	private static String prettyName(String item){
-		return WordUtils.capitalizeFully(item.replace('_',' '));
-	}
-
-	private static String getFriendlyName(ItemStack stack){
-		final ItemInfo itemInfo = Items.itemByStack(stack);
-		return ((itemInfo == null) ? prettyName(stack.getType().toString()) : itemInfo.getName());
-	}
-
-	private boolean cannotFit(final Inventory inventory,final ItemStack itemStack){
-		if(inventory.firstEmpty() != -1){
-			return false;
-		}
-		if(!inventory.containsAtLeast(itemStack,1)){
-			if(config.debugEnabled()){
-				log.info(itemStack.getType().toString() + " cannot fit in inventory, no similar stacks already present.");
-			}
-			return true;
-		}
-		//TODO quicker way that wouldn't involve putting items in player's inventory?
-		for(ItemStack invStack : inventory.getContents()){
-			if(invStack == null || !invStack.isSimilar(itemStack)){
-				continue;
-			}
-			if(invStack.getAmount() + itemStack.getAmount() <= itemStack.getMaxStackSize()){
-				if(config.debugEnabled()){
-					log.info(itemStack.getType().toString() + " can fit in inventory, similar stack present in inventory has enough space for items.");
-				}
-				return false;
-			}
-		}
-		if(config.debugEnabled()){
-			log.info(itemStack.getType().toString() + " cannot fit in inventory, similar stacks are present but none have enough space.");
-		}
-		return true;
-	}
-
-	private static String prettyNumber(BigDecimal number){
-		return (number.remainder(BigDecimal.ONE).equals(BigDecimal.ZERO) ? String.valueOf(number.intValue()) : number.toPlainString());
-	}
-
-	public static String fmt(double d){
-		return d == (long)d ? String.format("%d",(long)d) : String.format("%s",d);
-	}
 }

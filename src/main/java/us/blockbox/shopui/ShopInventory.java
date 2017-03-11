@@ -10,7 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
-import static us.blockbox.shopui.listener.ShopInteractListener.fmt;
+import static us.blockbox.shopui.Utils.fmt;
 import static us.blockbox.shopui.listener.ShopInteractListener.getShopByTitle;
 
 //Created 11/20/2016 4:32 AM
@@ -23,7 +23,7 @@ public class ShopInventory{
 	private static final CachedObject<ItemStack[]> menuCache = new CachedObject<ItemStack[]>(){
 		@Override
 		protected void validate(){
-			final ItemStack[] inv = new ItemStack[nearestMultiple(config.shopCategories.size(),9)];
+			final ItemStack[] inv = new ItemStack[Utils.nearestMultiple(config.shopCategories.size(),9)];
 			int pos = 0;
 			for(final Map.Entry<String,ShopCategory> i : config.shopCategories.entrySet()){
 				final ItemStack catItem = i.getValue().getItemStack().clone();
@@ -45,7 +45,7 @@ public class ShopInventory{
 		if(shopInvCache.containsKey(s)){
 			inv = (shopInvCache.get(s));
 		}else{
-			inv = Bukkit.createInventory(null,nearestMultiple(list.size(),9),s + shopSuffix);
+			inv = Bukkit.createInventory(null,Utils.nearestMultiple(list.size(),9),s + shopSuffix);
 			int pos = 0;
 			for(final ShopItem i : list){
 				final ItemStack item = i.getItemStack().clone();
@@ -63,10 +63,6 @@ public class ShopInventory{
 
 	public static Inventory getShopMenu(final OfflinePlayer player){
 		return getShopMenu(String.format(menuTitleFormat,fmt(econ.getBalance(player))));
-	}
-
-	public static int nearestMultiple(int number,int round){
-		return (int)Math.ceil((float)number / round) * round;
 	}
 
 	private static Inventory getShopMenu(String title){

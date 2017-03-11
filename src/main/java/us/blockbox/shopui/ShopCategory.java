@@ -2,8 +2,7 @@ package us.blockbox.shopui;
 
 import org.bukkit.inventory.ItemStack;
 
-//Created 11/20/2016 5:55 PM
-public class ShopCategory{
+public class ShopCategory{ //todo use uilib
 	private final String shopId;
 	private final String shopNameColored;
 	private final ItemStack itemStack;

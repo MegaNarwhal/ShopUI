@@ -82,7 +82,7 @@ class ShopTransactionLogger{
 		try(InputStream is = new BufferedInputStream(new FileInputStream(file))){
 			byte[] c = new byte[1024];
 			int count = 0;
-			int readChars = 0;
+			int readChars;
 			boolean empty = true;
 			while((readChars = is.read(c)) != -1){
 				empty = false;

@@ -13,10 +13,13 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import static org.bukkit.Bukkit.getServer;
+import static us.blockbox.shopui.ShopUI.prefix;
 
-//Created 11/20/2016 2:54 AM
 public class ShopConfig{
 
+	public static final String formatBuy = prefix + "You bought %d %s for %s%s."; //todo move to config
+	public static final String formatSell = prefix + "You sold %d %s for %s%s.";
+	public static final String currencyName = ShopUI.getEcon().currencyNamePlural();
 	private final ShopUI plugin = ShopUI.getInstance();
 	private Logger log = plugin.getLogger();
 	private FileConfiguration categoryConfig;
@@ -222,5 +225,17 @@ public class ShopConfig{
 
 	public boolean isUpdaterEnabled(){
 		return updaterEnabled;
+	}
+
+	public static String getFormatBuy(){
+		return formatBuy;
+	}
+
+	public static String getFormatSell(){
+		return formatSell;
+	}
+
+	public static String getCurrencyName(){
+		return currencyName;
 	}
 }
