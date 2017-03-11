@@ -10,8 +10,6 @@ import us.blockbox.shopui.ShopConfig;
 
 import java.util.Map;
 
-import static us.blockbox.shopui.ShopUI.prefix;
-
 //Created 11/28/2016 11:14 PM
 public class CommandListShops implements ISubCommand{
 
@@ -28,7 +26,7 @@ public class CommandListShops implements ISubCommand{
 			sender.sendMessage("No shop categories configured.");
 			return true;
 		}
-		sender.sendMessage(prefix + "Enabled categories:");
+		sender.sendMessage(ShopConfig.getPrefix() + "Enabled categories:");
 		if(sender instanceof Player){
 			final Player p = (Player)sender;
 			for(final Map.Entry<String,ShopCategory> cat : config.shopCategories.entrySet()){

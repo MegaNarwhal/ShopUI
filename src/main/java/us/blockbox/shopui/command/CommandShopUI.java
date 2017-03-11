@@ -4,11 +4,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import us.blockbox.shopui.ISubCommand;
+import us.blockbox.shopui.ShopConfig;
 import us.blockbox.shopui.SubCommandHandler;
 
 import java.util.Arrays;
 
-import static us.blockbox.shopui.ShopUI.prefix;
 import static us.blockbox.shopui.locale.ShopMessage.Message.PLAYER_PERMISSION_INSUFFICIENT;
 import static us.blockbox.shopui.locale.ShopMessage.getMessage;
 
@@ -41,6 +41,6 @@ public class CommandShopUI implements CommandExecutor{
 	}
 
 	private static void showHelp(final CommandSender sender){
-		sender.sendMessage(prefix + "Subcommands: " + sub.getSubCommands().toString());
+		sender.sendMessage(ShopConfig.getPrefix() + "Subcommands: " + sub.getSubCommands().toString());
 	}
 }

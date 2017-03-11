@@ -13,13 +13,13 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import static org.bukkit.Bukkit.getServer;
-import static us.blockbox.shopui.ShopUI.prefix;
 
 public class ShopConfig{
 
-	public static final String formatBuy = prefix + "You bought %d %s for %s%s."; //todo move to config
-	public static final String formatSell = prefix + "You sold %d %s for %s%s.";
+	public static final String formatBuy = getPrefix() + "You bought %d %s for %s%s."; //todo allow changing
+	public static final String formatSell = getPrefix() + "You sold %d %s for %s%s.";
 	public static final String currencyName = ShopUI.getInstance().getEcon().currencyNamePlural();
+	public static final String prefix = ChatColor.GREEN + "Shop" + ChatColor.DARK_GRAY + "> " + ChatColor.RESET;
 	private final ShopUI plugin = ShopUI.getInstance();
 	private Logger log = plugin.getLogger();
 	private FileConfiguration categoryConfig;
@@ -28,6 +28,10 @@ public class ShopConfig{
 	public Map<String,ShopCategory> shopCategories = new LinkedHashMap<>();
 	private boolean debug = false;
 	private boolean updaterEnabled = false;
+
+	public static String getPrefix(){
+		return prefix;
+	}
 
 	public boolean debugEnabled(){
 		return debug;

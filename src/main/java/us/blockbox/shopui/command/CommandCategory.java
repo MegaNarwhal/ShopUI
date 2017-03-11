@@ -7,8 +7,6 @@ import org.bukkit.inventory.ItemStack;
 import us.blockbox.shopui.ISubCommand;
 import us.blockbox.shopui.ShopConfig;
 
-import static us.blockbox.shopui.ShopUI.prefix;
-
 //Created 11/30/2016 2:27 AM
 public class CommandCategory implements ISubCommand{
 
@@ -35,9 +33,9 @@ public class CommandCategory implements ISubCommand{
 			held = new ItemStack(Material.STONE);
 		}
 		if(config.addCategory(args[0],name,held)){
-			sender.sendMessage(prefix + "Category " + args[0] + " created.");
+			sender.sendMessage(ShopConfig.getPrefix() + "Category " + args[0] + " created.");
 		}else{
-			sender.sendMessage(prefix + "Category creation failed.");
+			sender.sendMessage(ShopConfig.getPrefix() + "Category creation failed.");
 		}
 		return true;
 	}

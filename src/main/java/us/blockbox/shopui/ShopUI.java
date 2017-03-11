@@ -24,7 +24,6 @@ public class ShopUI extends JavaPlugin{
 	private static ShopUI instance = null;
 	private Logger log;
 	private Economy econ;
-	public static final String prefix = ChatColor.GREEN + "Shop" + ChatColor.DARK_GRAY + "> " + ChatColor.RESET;
 	private final SubCommandHandler sub = SubCommandHandler.getInstance();
 
 	@Override

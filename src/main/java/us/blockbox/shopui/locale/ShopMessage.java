@@ -3,6 +3,7 @@ package us.blockbox.shopui.locale;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import us.blockbox.shopui.ShopConfig;
 import us.blockbox.shopui.ShopUI;
 
 import java.io.File;
@@ -43,7 +44,7 @@ public class ShopMessage{
 	public static void sendShopMsg(CommandSender sender,Message message){ //todo use this
 		final String msg = getMessage(message);
 		if(msg != null && !msg.equals("")){
-			sender.sendMessage(ShopUI.prefix + msg);
+			sender.sendMessage(ShopConfig.getPrefix() + msg);
 		}
 	}
 }
