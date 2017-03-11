@@ -18,8 +18,8 @@ import us.blockbox.shopui.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.logging.Logger;
 
-import static us.blockbox.shopui.ShopUI.log;
 import static us.blockbox.shopui.Utils.soundDenied;
 import static us.blockbox.shopui.Utils.soundSuccess;
 import static us.blockbox.shopui.locale.ShopMessage.Message.PLAYER_INVENTORY_FULL;
@@ -28,14 +28,10 @@ import static us.blockbox.shopui.locale.ShopMessage.getMessage;
 @Deprecated
 public class ShopInteractListener implements Listener{
 
-	private static final Economy econ = ShopUI.getEcon();
-	private static JavaPlugin plugin;
-	private static final EnumSet<ClickType> clicksValid = EnumSet.of(ClickType.LEFT,ClickType.SHIFT_LEFT,ClickType.RIGHT,ClickType.SHIFT_RIGHT);
-
-	public ShopInteractListener(JavaPlugin plugin){
-		ShopInteractListener.plugin = plugin;
-	}
-
+	private static JavaPlugin plugin = ShopUI.getInstance();
+	private final Economy econ = ShopUI.getInstance().getEcon();
+	private Logger log = ShopUI.getInstance().getLogger();
+	private final EnumSet<ClickType> clicksValid = EnumSet.of(ClickType.LEFT,ClickType.SHIFT_LEFT,ClickType.RIGHT,ClickType.SHIFT_RIGHT);
 
 	//todo change player money all at once when they close shop?
 
@@ -165,7 +161,7 @@ public class ShopInteractListener implements Listener{
 					break;
 				}
 				final int maxStack = shopStack.getMaxStackSize();
-				final double bal = ShopUI.getEcon().getBalance(p);
+				final double bal = econ.getBalance(p);
 				int amount = (int)Math.floor(bal / priceBuy) * shopItem.getQuantityDefault();
 				if(amount == 0){
 					soundDenied(p);
