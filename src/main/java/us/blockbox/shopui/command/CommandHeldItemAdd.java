@@ -26,7 +26,7 @@ public class CommandHeldItemAdd implements ISubCommand{
 			sender.sendMessage(PLAYER_PERMISSION_INSUFFICIENT.getMsg());
 			return true;
 		}*/
-		if(args.length != 4 && args.length != 5){
+		if(args.length < 3){ //New requirements should be <shop> <buy> <sell> [quantity] [itemname]
 			showUsage(sender);
 			return false;
 		}
@@ -52,26 +52,34 @@ public class CommandHeldItemAdd implements ISubCommand{
 			return true;
 		}
 
+
+		String itemName;
 		int amount = 1;
-		if(args.length == 5){
+		if(args.length > 3){
 			try{
 				amount = Integer.parseInt(args[3]);
+				if(args.length > 4) //Did they use [0]<shop> [1]<buy> [2]<sell> [3][quantity] [4]<itemname>? Then arg 4 is their item name
+					itemName = args[4];
+				else
+					itemName = held.getType().toString(); //They used [0]<shop> [1]<buy> [2]<sell> [3][quantity] so we will set the item name to the held item's type
 			}catch(NumberFormatException ex){
-				sender.sendMessage(prefix + "Invalid quantity specified, defaulting to 1.");
+				amount = 1;
+				itemName = args[3]; //arg[3] isn't an integer, they must've skipped the quantity and put the item name: [0]<shop> [1]<buy> [2]<sell> [3]<itemname>
 			}
 		}else{
 			amount = held.getAmount();
+			itemName = held.getType().toString(); //They didn't set a quantity or an item name, let's default this to the held item's type again [0]<shop> [1]<buy> [2]<sell>
 		}
 
 		if(held.hasItemMeta()){
-			if(config.addItem(args[0],(args.length == 5 ? args[4] : args[3]),held,priceBuy,priceSell,amount)){
+			if(config.addItem(args[0], itemName,held,priceBuy,priceSell,amount)){
 				sender.sendMessage(prefix + "Complex item added to " + args[0] + ".");
 			}else{
 				sender.sendMessage(getMessage(COMMAND_ADD_FAILED));
 			}
 		}else{
 			final String simpleItem = held.getType().toString() + ((held.getDurability() != 0) ? (":" + held.getDurability()) : "");
-			if(config.addItem(args[0],(args.length == 5 ? args[4] : args[3]),simpleItem,priceBuy,priceSell,amount)){
+			if(config.addItem(args[0], itemName, simpleItem, priceBuy, priceSell, amount)){
 				sender.sendMessage(prefix + "Simple item added to " + args[0] + ".");
 			}else{
 				sender.sendMessage(getMessage(COMMAND_ADD_FAILED));
@@ -86,6 +94,6 @@ public class CommandHeldItemAdd implements ISubCommand{
 	}
 
 	private static void showUsage(final CommandSender sender){
-		sender.sendMessage(prefix + "/shopui add <shop> <buy> <sell> [quantity] <itemname>");
+		sender.sendMessage(prefix + "/shopui add <shop> <buy> <sell> [quantity] [itemname]");
 	}
 }
