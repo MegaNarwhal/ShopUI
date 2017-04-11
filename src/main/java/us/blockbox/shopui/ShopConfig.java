@@ -6,6 +6,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import us.blockbox.shopui.listener.CommandShopPreProcessListener;
+import us.blockbox.uilib.component.Category;
+import us.blockbox.uilib.component.ConcreteCategory;
+import us.blockbox.uilib.view.InventoryView;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +27,9 @@ public class ShopConfig{
 	private Logger log = plugin.getLogger();
 	private FileConfiguration categoryConfig;
 	private File categoryConfigFile = new File(plugin.getDataFolder(),"shops.yml");
-	public Map<String,List<ShopItem>> shopItems = new HashMap<>();
-	public Map<String,ShopCategory> shopCategories = new LinkedHashMap<>();
+	private Map<String,List<ShopItem>> shopItems = new HashMap<>();
+	private Map<String,ShopCategory> shopCategories = new LinkedHashMap<>();
+	private Map<String,Category> shopCategoriesNew = new LinkedHashMap<>();
 	private boolean debug = false;
 	private boolean updaterEnabled = false;
 
@@ -93,8 +97,9 @@ public class ShopConfig{
 		opts.put("name",name);
 		if(debug){
 			log.info("Creating new category.");
-			log.info("item: " + opts.get("item"));
-			log.info("name: " + opts.get("name"));
+			for(Map.Entry<String,String> e : opts.entrySet()){
+				log.info(e.getKey() + ": " + e.getValue());
+			}
 		}
 		categoryConfig.set(id,opts);
 		try{
@@ -120,13 +125,17 @@ public class ShopConfig{
 		}
 		return true;
 	}
-//todo more debug output
+
 	private void parseCategory(String s){
 		String shopName = ChatColor.translateAlternateColorCodes('&',categoryConfig.getString(s + ".name",s));
 		if(debug){
 			log.info("Loading category " + shopName + " (ID: " + s + ")");
 		}
-		shopCategories.put(ChatColor.stripColor(shopName),new ShopCategory(s,shopName,parseItemInfo(categoryConfig.getString(s + ".item",null),1)));
+		ItemStack itemStack = parseItemInfo(categoryConfig.getString(s + ".item",null),1);
+		String name = ChatColor.stripColor(shopName);
+		shopCategories.put(name,new ShopCategory(s,shopName,itemStack));
+		Category c = new ConcreteCategory(shopName,s,null,itemStack,null); //todo
+		shopCategoriesNew.put(name,c);
 	}
 
 	private void parseShop(final String shop){
@@ -241,5 +250,17 @@ public class ShopConfig{
 
 	public static String getCurrencyName(){
 		return currencyName;
+	}
+
+	public Map<String,List<ShopItem>> getShopItems(){
+		return shopItems;
+	}
+
+	public Map<String,ShopCategory> getShopCategories(){
+		return shopCategories;
+	}
+
+	public Map<String,Category> getShopCategoriesNew(){
+		return shopCategoriesNew;
 	}
 }

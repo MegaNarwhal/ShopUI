@@ -275,7 +275,7 @@ public class ShopInteractListener implements Listener{
 	private void menuInteract(Player p,ItemStack item){
 		final Inventory inv = ShopInventory.getShopInventory(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
 		if(inv != null){
-			if(ShopItemNew.config.debugEnabled()){
+			if(ShopItemNew.getConfig().debugEnabled()){
 				log.info("Opening inventory " + item.getItemMeta().getDisplayName() + " for " + p.getName());
 			}
 			p.openInventory(inv);
@@ -284,7 +284,7 @@ public class ShopInteractListener implements Listener{
 	}
 
 	public static List<ShopItem> getShopByTitle(String title){
-		return ShopItemNew.config.shopItems.get(ShopItemNew.config.shopCategories.get(title).getShopId());
+		return ShopItemNew.getConfig().getShopItems().get(ShopItemNew.getConfig().getShopCategories().get(title).getShopId());
 	}
 
 }

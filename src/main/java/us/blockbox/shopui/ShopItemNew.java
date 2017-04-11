@@ -19,7 +19,7 @@ import static us.blockbox.shopui.locale.ShopMessage.getMessage;
 
 public class ShopItemNew extends AbstractItem{
 	private static Economy econ = ShopUI.getInstance().getEcon();
-	public static final ShopConfig config = ShopConfig.getInstance();
+	private static final ShopConfig config = ShopConfig.getInstance();
 	private static final ShopUI plugin = ShopUI.getInstance();
 	private double priceBuy;
 	private double priceSell;
@@ -37,6 +37,10 @@ public class ShopItemNew extends AbstractItem{
 		this.priceBuy = priceBuy;
 		this.priceSell = priceSell;
 		this.quantityDefault = quantityDefault;
+	}
+
+	public static ShopConfig getConfig(){
+		return config;
 	}
 
 	@Override

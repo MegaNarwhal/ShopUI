@@ -22,21 +22,21 @@ public class CommandListShops implements ISubCommand{
 			sender.sendMessage(ShopMessage.PLAYER_PERMISSION_INSUFFICIENT.getMsg());
 			return true;
 		}*/
-		if(config.shopCategories.isEmpty()){
+		if(config.getShopCategories().isEmpty()){
 			sender.sendMessage("No shop categories configured.");
 			return true;
 		}
 		sender.sendMessage(ShopConfig.getPrefix() + "Enabled categories:");
 		if(sender instanceof Player){
 			final Player p = (Player)sender;
-			for(final Map.Entry<String,ShopCategory> cat : config.shopCategories.entrySet()){
+			for(final Map.Entry<String,ShopCategory> cat : config.getShopCategories().entrySet()){
 				final String id = cat.getValue().getShopId();
 				final String name = cat.getKey();
 				Bukkit.getServer().dispatchCommand(console,"tellraw " + p.getName() + " {\"text\":\"- " + name + " (" + id + ")\",\"color\":\"white\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/shopui add " + id + " \"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Click to add item to " + name + "\"}]}}}");
 				//new FancyMessage("- " + name + " (" + id + ")").suggest("/shopadd " + id + " ").tooltip("Add an item to " + name).send(p);
 			}
 		}else{
-			for(final Map.Entry<String,ShopCategory> cat : config.shopCategories.entrySet()){
+			for(final Map.Entry<String,ShopCategory> cat : config.getShopCategories().entrySet()){
 				sender.sendMessage("- " + cat.getKey() + ChatColor.GRAY + " (" + cat.getValue().getShopId() + ")");
 			}
 		}

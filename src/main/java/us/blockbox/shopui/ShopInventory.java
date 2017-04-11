@@ -23,9 +23,9 @@ public class ShopInventory{
 	private static final CachedObject<ItemStack[]> menuCache = new CachedObject<ItemStack[]>(){
 		@Override
 		protected void validate(){
-			final ItemStack[] inv = new ItemStack[Utils.nearestMultiple(config.shopCategories.size(),9)];
+			final ItemStack[] inv = new ItemStack[Utils.nearestMultiple(config.getShopCategories().size(),9)];
 			int pos = 0;
-			for(final Map.Entry<String,ShopCategory> i : config.shopCategories.entrySet()){
+			for(final Map.Entry<String,ShopCategory> i : config.getShopCategories().entrySet()){
 				final ItemStack catItem = i.getValue().getItemStack().clone();
 				final ItemMeta meta = catItem.getItemMeta();
 				meta.setDisplayName(i.getValue().getShopNameColored());

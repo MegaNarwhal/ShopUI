@@ -24,8 +24,6 @@ public class ShopUI extends JavaPlugin{
 	private static ShopUI instance = null;
 	private Logger log;
 	private Economy econ;
-	private final SubCommandHandler sub = SubCommandHandler.getInstance();
-
 	@Override
 	public void onEnable(){
 		log = getLogger();
@@ -55,6 +53,7 @@ public class ShopUI extends JavaPlugin{
 		getCommand("shop").setExecutor(new CommandShop());
 		getCommand("shopui").setExecutor(new CommandShopUI());
 		getCommand("shopui").setTabCompleter(new ShopUICompleter());
+		SubCommandHandler sub = SubCommandHandler.getInstance();
 		sub.addSubCommand("add",new CommandHeldItemAdd());
 		sub.addSubCommand("list",new CommandListShops());
 		sub.addSubCommand("create",new CommandCategory());
