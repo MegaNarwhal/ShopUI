@@ -40,7 +40,7 @@ public class Utils{
 			return false;
 		}
 		if(!inventory.containsAtLeast(itemStack,1)){
-			if(ShopItemNew.getConfig().debugEnabled()){
+			if(ShopItemNew.getConfig().isDebugEnabled()){
 				log.info(itemStack.getType().toString() + " cannot fit in inventory, no similar stacks already present.");
 			}
 			return true;
@@ -51,13 +51,13 @@ public class Utils{
 				continue;
 			}
 			if(invStack.getAmount() + itemStack.getAmount() <= itemStack.getMaxStackSize()){
-				if(ShopItemNew.getConfig().debugEnabled()){
+				if(ShopItemNew.getConfig().isDebugEnabled()){
 					log.info(itemStack.getType().toString() + " can fit in inventory, similar stack present in inventory has enough space for items.");
 				}
 				return false;
 			}
 		}
-		if(ShopItemNew.getConfig().debugEnabled()){
+		if(ShopItemNew.getConfig().isDebugEnabled()){
 			log.info(itemStack.getType().toString() + " cannot fit in inventory, similar stacks are present but none have enough space.");
 		}
 		return true;

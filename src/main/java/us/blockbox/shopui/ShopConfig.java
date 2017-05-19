@@ -27,7 +27,7 @@ public class ShopConfig{
 	private Logger log = plugin.getLogger();
 	private FileConfiguration categoryConfig;
 	private File categoryConfigFile = new File(plugin.getDataFolder(),"shops.yml");
-	private Map<String,List<ShopItem>> shopItems = new HashMap<>();
+	private Map<String,List<ShopItem>> shopItems = new HashMap<>(); //todo items will be in view referenced by category
 	private Map<String,ShopCategory> shopCategories = new LinkedHashMap<>();
 	private Map<String,Category> shopCategoriesNew = new LinkedHashMap<>();
 	private boolean debug = false;
@@ -37,7 +37,7 @@ public class ShopConfig{
 		return prefix;
 	}
 
-	public boolean debugEnabled(){
+	public boolean isDebugEnabled(){
 		return debug;
 	}
 
@@ -126,7 +126,7 @@ public class ShopConfig{
 		return true;
 	}
 
-	private void parseCategory(String s){
+	private void parseCategory(String s){ //todo generate subview
 		String shopName = ChatColor.translateAlternateColorCodes('&',categoryConfig.getString(s + ".name",s));
 		if(debug){
 			log.info("Loading category " + shopName + " (ID: " + s + ")");

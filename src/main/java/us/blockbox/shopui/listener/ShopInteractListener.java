@@ -25,6 +25,9 @@ import static us.blockbox.shopui.Utils.soundSuccess;
 import static us.blockbox.shopui.locale.ShopMessage.Message.PLAYER_INVENTORY_FULL;
 import static us.blockbox.shopui.locale.ShopMessage.getMessage;
 
+/**
+ * @deprecated Interactions are now handled through UILib.
+ */
 @Deprecated
 public class ShopInteractListener implements Listener{
 
@@ -275,7 +278,7 @@ public class ShopInteractListener implements Listener{
 	private void menuInteract(Player p,ItemStack item){
 		final Inventory inv = ShopInventory.getShopInventory(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
 		if(inv != null){
-			if(ShopItemNew.getConfig().debugEnabled()){
+			if(ShopItemNew.getConfig().isDebugEnabled()){
 				log.info("Opening inventory " + item.getItemMeta().getDisplayName() + " for " + p.getName());
 			}
 			p.openInventory(inv);
