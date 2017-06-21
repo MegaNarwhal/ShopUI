@@ -2,6 +2,7 @@ package us.blockbox.shopui;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemFlag;
@@ -53,6 +54,11 @@ public class ShopConfig{
 		categoryConfig = YamlConfiguration.loadConfiguration(categoryConfigFile);
 		plugin.saveDefaultConfig();
 		final FileConfiguration config = plugin.getConfig();
+		if(!keysMatch(config,config.getDefaults())){
+			log.info("Copying new configuration options to config.yml.");
+			config.options().copyDefaults(true);
+			plugin.saveConfig();
+		}
 		final File shopDir = new File(plugin.getDataFolder(),"shops/");
 		if(!shopDir.exists() && !shopDir.isDirectory()){
 			plugin.saveResource("shops/test.yml",false);
@@ -82,6 +88,10 @@ public class ShopConfig{
 			log.info("Forcing shop command.");
 			getServer().getPluginManager().registerEvents(new CommandShopPreProcessListener(),plugin);
 		}
+	}
+
+	private static boolean keysMatch(Configuration configuration,Configuration configuration1){
+		return configuration.getKeys(true).equals(configuration1.getKeys(true));
 	}
 
 	public boolean addCategory(String id,String name,ItemStack itemStack){
