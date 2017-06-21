@@ -1,3 +1,4 @@
 forceshopcommand: false
+runtransactionsasync: false
 updatechecker: true
 debug: false

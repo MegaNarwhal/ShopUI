@@ -155,7 +155,7 @@ public class ShopInteractListener implements Listener{
 						soundDenied(p);
 						break;
 					}
-					new VaultTransactionTask(p,-priceBuy,shopStack.getType()).runTaskAsynchronously(plugin);
+					runWithProperSync(new VaultTransactionTask(p,-priceBuy,shopStack.getType()));
 					p.sendMessage(String.format(formatBuy,shopStack.getAmount(),getFriendlyName(shopStack),fmt(priceBuy),currencyName));
 					soundSuccess(p);
 				}else{
@@ -192,7 +192,7 @@ public class ShopInteractListener implements Listener{
 					amount -= failedAmount;
 				}
 				if(price > 0){
-					new VaultTransactionTask(p,-price,shopStack.getType()).runTaskAsynchronously(plugin);
+					runWithProperSync(new VaultTransactionTask(p,-price,shopStack.getType()));
 					p.sendMessage(String.format(formatBuy,amount,getFriendlyName(shopStack),fmt(price),currencyName));
 					soundSuccess(p);
 				}else{
@@ -225,7 +225,7 @@ public class ShopInteractListener implements Listener{
 				}*/
 
 				if(playerInv.removeItem(shopStack).isEmpty()){
-					new VaultTransactionTask(p,priceSell,shopStack.getType()).runTaskAsynchronously(plugin);
+					runWithProperSync(new VaultTransactionTask(p,priceSell,shopStack.getType()));
 					p.sendMessage(String.format(formatSell,quantity,getFriendlyName(shopStack),fmt(priceSell),currencyName));
 					soundSuccess(p);
 				}else{
@@ -258,7 +258,7 @@ public class ShopInteractListener implements Listener{
 				shopStack.setAmount(amount);
 				if(playerInv.removeItem(shopStack).isEmpty()){
 					double total = BigDecimal.valueOf(priceSell).multiply(BigDecimal.valueOf(amount)).divide(BigDecimal.valueOf(shopItem.getQuantityDefault()),RoundingMode.FLOOR).doubleValue();
-					new VaultTransactionTask(p,total,shopStack.getType()).runTaskAsynchronously(plugin);
+					runWithProperSync(new VaultTransactionTask(p,total,shopStack.getType()));
 					p.sendMessage(String.format(formatSell,amount,getFriendlyName(shopStack),fmt(total),currencyName));
 					soundSuccess(p);
 				}else{
@@ -347,5 +347,13 @@ public class ShopInteractListener implements Listener{
 
 	public static String fmt(double d){
 		return d == (long)d ? String.format("%d",(long)d) : String.format("%s",d);
+	}
+
+	public void runWithProperSync(BukkitRunnable runnable){
+		if(config.isAsyncEnabled()){
+			runnable.runTaskAsynchronously(plugin);
+		}else{
+			runnable.runTask(plugin);
+		}
 	}
 }

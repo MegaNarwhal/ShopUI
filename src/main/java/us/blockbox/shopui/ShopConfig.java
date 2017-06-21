@@ -4,7 +4,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import us.blockbox.shopui.listener.CommandShopPreProcessListener;
 
 import java.io.File;
@@ -25,9 +27,14 @@ public class ShopConfig{
 	public Map<String,ShopCategory> shopCategories = new LinkedHashMap<>();
 	private boolean debug = false;
 	private boolean updaterEnabled = false;
+	private boolean asyncEnabled;
 
 	public boolean debugEnabled(){
 		return debug;
+	}
+
+	public boolean isAsyncEnabled(){
+		return asyncEnabled;
 	}
 
 	private static ShopConfig ourInstance = new ShopConfig();
@@ -53,6 +60,10 @@ public class ShopConfig{
 		debug = config.getBoolean("debug",false);
 		if(debug){
 			log.info("Debugging is enabled!");
+		}
+		asyncEnabled = config.getBoolean("runtransactionsasync");
+		if(asyncEnabled){
+			log.warning("Async transactions enabled. This can cause issues with some economy plugins.");
 		}
 		if(config.isSet("updatechecker")){
 			updaterEnabled = config.getBoolean("updatechecker");
@@ -119,7 +130,11 @@ public class ShopConfig{
 		if(debug){
 			log.info("Loading category " + shopName + " (ID: " + s + ")");
 		}
-		shopCategories.put(ChatColor.stripColor(shopName),new ShopCategory(s,shopName,parseItemInfo(categoryConfig.getString(s + ".item",null),1)));
+		final ItemStack itemStack = parseItemInfo(categoryConfig.getString(s + ".item",null),1);
+		final ItemMeta meta = itemStack.getItemMeta();
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES,ItemFlag.HIDE_POTION_EFFECTS);
+		itemStack.setItemMeta(meta);
+		shopCategories.put(ChatColor.stripColor(shopName),new ShopCategory(s,shopName,itemStack));
 	}
 
 	private void parseShop(final String shop){
