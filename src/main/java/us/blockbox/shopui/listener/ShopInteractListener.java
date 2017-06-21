@@ -36,6 +36,7 @@ public class ShopInteractListener implements Listener{
 	private static final EnumSet<ClickType> clicksValid = EnumSet.of(ClickType.LEFT,ClickType.SHIFT_LEFT,ClickType.RIGHT,ClickType.SHIFT_RIGHT);
 	private static final String currencyName = econ.currencyNamePlural();
 	private static final ShopConfig config = ShopConfig.getInstance();
+	private final ShopUserManager shopUserManager = ShopUserManager.getInstance();
 
 	public ShopInteractListener(JavaPlugin plugin){
 		ShopInteractListener.plugin = plugin;
@@ -77,7 +78,7 @@ public class ShopInteractListener implements Listener{
 			return;
 		}
 //		System.out.println(clickedSlot + " " + shopSlots);
-		if(ShopUser.shopUsers.contains(p)){
+		if(shopUserManager.isRecentUser(p)){
 			e.setCancelled(true);
 			return;
 		}
@@ -271,14 +272,7 @@ public class ShopInteractListener implements Listener{
 			}
 		}
 
-		if(ShopUser.shopUsers.add(p)){
-			new BukkitRunnable(){
-				@Override
-				public void run(){
-					ShopUser.shopUsers.remove(p);
-				}
-			}.runTaskLater(plugin,3L);
-		}
+		shopUserManager.add(p);
 	}
 
 	private void menuInteract(Player p,ItemStack item){
